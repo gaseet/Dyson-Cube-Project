@@ -106,6 +106,7 @@ dependencies {
     compileOnly "mezz.jei:jei-1.21.1-neoforge-api:$jei_version"
     runtimeOnly "mezz.jei:jei-1.21.1-neoforge:$jei_version"
     implementation project.dependencies.create('com.hrznstudio:titanium:1.21-4.0.40')
+    compileOnly "curse.maven:flux-networks-248020:6089446"
     runtimeOnly "curse.maven:ender-io-64578:7036575"
     //runtimeOnly "curse.maven:irisshaders-455508:6661598"
     //runtimeOnly "curse.maven:sodium-394468:6382651"
