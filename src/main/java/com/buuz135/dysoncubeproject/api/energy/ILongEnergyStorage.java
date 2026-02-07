@@ -1,13 +1,10 @@
 package com.buuz135.dysoncubeproject.api.energy;
 
-import net.neoforged.neoforge.common.capabilities.AutoRegisterCapability;
-
 /**
  * Extended energy storage interface that supports Long.MAX_VALUE energy transfers.
  * Similar to Flux Networks' IFNEnergyStorage.
  * Use this capability when your block can handle energy values exceeding Integer.MAX_VALUE.
  */
-@AutoRegisterCapability
 public interface ILongEnergyStorage {
     
     /**
