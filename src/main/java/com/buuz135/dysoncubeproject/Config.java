@@ -21,6 +21,8 @@ public class Config {
     @ConfigVal(comment = "Always show sphere at max progress")
     public static boolean SHOW_AT_MAX_PROGRESS = false;
 
+    // Note: Using InRangeInt on long fields as InRangeLong doesn't exist in Titanium
+    // These values are still properly stored and used as long at runtime
     @ConfigVal(comment = "The power that the ray receiver can extract from the sphere every tick")
     @ConfigVal.InRangeInt(min = 1)
     public static long RAY_RECEIVER_EXTRACT_POWER = 50_000_000L;

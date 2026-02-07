@@ -49,12 +49,12 @@ public class LongEnergyStorageComponent<T extends IComponentHarness> implements 
     // IEnergyStorage implementation (int-based for compatibility)
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
-        return (int) receiveLongEnergy(maxReceive, simulate);
+        return (int) Math.min(receiveLongEnergy(maxReceive, simulate), Integer.MAX_VALUE);
     }
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
-        return (int) extractLongEnergy(maxExtract, simulate);
+        return (int) Math.min(extractLongEnergy(maxExtract, simulate), Integer.MAX_VALUE);
     }
 
     @Override
@@ -145,7 +145,7 @@ public class LongEnergyStorageComponent<T extends IComponentHarness> implements 
         // For long values, we need to cap to int for container sync compatibility
         return Lists.newArrayList(
             () -> new IntReferenceHolderAddon(new FunctionReferenceHolder(
-                (value) -> this.setEnergyStored(value), 
+                (value) -> this.setEnergyStored((long) value), 
                 () -> (int) Math.min(this.getLongEnergyStored(), Integer.MAX_VALUE)
             ))
         );
