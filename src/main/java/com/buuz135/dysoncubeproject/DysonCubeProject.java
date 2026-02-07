@@ -88,6 +88,8 @@ public class DysonCubeProject extends ModuleController {
             }, DCPContent.Blocks.MULTIBLOCK_STRUCTURE.getBlock());
             event.registerBlock(Capabilities.EnergyStorage.BLOCK, (level, blockPos, blockState, blockEntity, direction) -> {
                 if (level instanceof ServerLevel serverLevel && blockEntity instanceof RayReceiverBlockEntity rayReceiverBlockEntity && direction == Direction.DOWN) {
+                    // Note: IEnergyStorage interface uses int, but our component stores long values
+                    // Values are automatically capped when accessed through this interface
                     return rayReceiverBlockEntity.getEnergyStorageComponent();
                 }
                 return null;

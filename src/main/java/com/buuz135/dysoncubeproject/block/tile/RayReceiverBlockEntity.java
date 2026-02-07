@@ -4,6 +4,7 @@ import com.buuz135.dysoncubeproject.Config;
 import com.buuz135.dysoncubeproject.DCPContent;
 import com.buuz135.dysoncubeproject.client.gui.DysonProgressGuiAddon;
 import com.buuz135.dysoncubeproject.client.gui.SubscribeDysonGuiAddon;
+import com.buuz135.dysoncubeproject.component.LongEnergyStorageComponent;
 import com.buuz135.dysoncubeproject.world.DysonSphereStructure;
 import com.buuz135.dysoncubeproject.world.DysonSphereProgressSavedData;
 import com.hrznstudio.titanium.annotation.Save;
@@ -60,14 +61,14 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
     @Save
     private String dysonSphereId;
     @Save
-    private EnergyStorageComponent<RayReceiverBlockEntity> energyStorageComponent;
+    private LongEnergyStorageComponent<RayReceiverBlockEntity> energyStorageComponent;
     @Save
     private float currentPitch;
 
     public RayReceiverBlockEntity(BasicTileBlock<RayReceiverBlockEntity> base, BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
         super(base, blockEntityType, pos, state);
         this.dysonSphereId = "";
-        this.energyStorageComponent = new EnergyStorageComponent<>(Config.RAY_RECEIVER_POWER_BUFFER, 0, Integer.MAX_VALUE, 19, 22);
+        this.energyStorageComponent = new LongEnergyStorageComponent<>(Config.RAY_RECEIVER_POWER_BUFFER, 0, Long.MAX_VALUE, 19, 22);
         this.currentPitch = 270;
     }
 
@@ -75,14 +76,17 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
     public void serverTick(Level level, BlockPos pos, BlockState state, RayReceiverBlockEntity blockEntity) {
         if (level.isDay() && !level.isRaining() && level.canSeeSky(pos.above())) {
             var dyson = DysonSphereProgressSavedData.get(level);
-            var extractingAmount = Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, this.energyStorageComponent.getMaxEnergyStored() - this.energyStorageComponent.getEnergyStored());
-            var extracted = dyson.getSpheres().computeIfAbsent(this.dysonSphereId, s -> new DysonSphereStructure()).extractPower(extractingAmount);
-            this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getEnergyStored() + (int) Math.min(extracted, Integer.MAX_VALUE));
+            long extractingAmount = Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, this.energyStorageComponent.getMaxLongEnergyStored() - this.energyStorageComponent.getLongEnergyStored());
+            long extracted = dyson.getSpheres().computeIfAbsent(this.dysonSphereId, s -> new DysonSphereStructure()).extractPower(extractingAmount);
+            this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getLongEnergyStored() + extracted);
         }
         var capability = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.below(), Direction.UP);
         if (capability != null && capability.canReceive()) {
-            var received = capability.receiveEnergy(Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, this.energyStorageComponent.getEnergyStored()), true);
-            this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getEnergyStored() - received);
+            // Cap to Integer.MAX_VALUE for compatibility with other mods
+            long energyToSend = Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, this.energyStorageComponent.getLongEnergyStored());
+            int energyToSendCapped = (int) Math.min(energyToSend, Integer.MAX_VALUE);
+            int received = capability.receiveEnergy(energyToSendCapped, true);
+            this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getLongEnergyStored() - received);
             capability.receiveEnergy(received, false);
         }
 
@@ -187,7 +191,7 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
         this.dysonSphereId = dysonSphereId;
     }
 
-    public EnergyStorageComponent<RayReceiverBlockEntity> getEnergyStorageComponent() {
+    public LongEnergyStorageComponent<RayReceiverBlockEntity> getEnergyStorageComponent() {
         return energyStorageComponent;
     }
 
