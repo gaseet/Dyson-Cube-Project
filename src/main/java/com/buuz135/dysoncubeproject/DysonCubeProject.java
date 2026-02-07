@@ -5,6 +5,7 @@ import com.buuz135.dysoncubeproject.block.tile.RayReceiverBlockEntity;
 import com.buuz135.dysoncubeproject.api.DCPCapabilities;
 import com.buuz135.dysoncubeproject.client.ClientSetup;
 import com.buuz135.dysoncubeproject.datagen.*;
+import com.buuz135.dysoncubeproject.integration.FluxNetworksIntegration;
 import com.buuz135.dysoncubeproject.network.ClientSubscribeSphereMessage;
 import com.buuz135.dysoncubeproject.network.DysonSphereSyncMessage;
 import com.buuz135.dysoncubeproject.world.DysonSphereStructure;
@@ -105,6 +106,9 @@ public class DysonCubeProject extends ModuleController {
                 }
                 return null;
             }, DCPContent.Blocks.RAY_RECEIVER_CONTROLLER.getBlock());
+            
+            // FLUX NETWORKS INTEGRATION (register DCP blocks as providers of FN's capability)
+            FluxNetworksIntegration.registerCapabilities(event, DCPContent.Blocks.RAY_RECEIVER_CONTROLLER.getBlock());
         }).subscribe();
         EventManager.forge(RegisterCommandsEvent.class).process(event -> {
             var dispatcher = event.getDispatcher();

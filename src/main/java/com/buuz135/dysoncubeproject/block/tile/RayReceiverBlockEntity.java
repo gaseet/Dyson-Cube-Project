@@ -6,6 +6,7 @@ import com.buuz135.dysoncubeproject.api.DCPCapabilities;
 import com.buuz135.dysoncubeproject.component.LongEnergyStorageComponent;
 import com.buuz135.dysoncubeproject.client.gui.DysonProgressGuiAddon;
 import com.buuz135.dysoncubeproject.client.gui.SubscribeDysonGuiAddon;
+import com.buuz135.dysoncubeproject.integration.FluxNetworksIntegration;
 import com.buuz135.dysoncubeproject.world.DysonSphereStructure;
 import com.buuz135.dysoncubeproject.world.DysonSphereProgressSavedData;
 import com.hrznstudio.titanium.annotation.Save;
@@ -87,7 +88,7 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
             this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getLongEnergyStored() + extracted);
         }
         
-        // TRY LONG CAPABILITY FIRST (DCP blocks, Flux Networks, etc.)
+        // TRY LONG CAPABILITY FIRST (DCP blocks, etc.)
         var longCapability = level.getCapability(DCPCapabilities.LONG_ENERGY_STORAGE, pos.below(), Direction.UP);
         if (longCapability != null) {
             // Long capability exists - try to transfer energy
@@ -98,14 +99,22 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
                 this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getLongEnergyStored() - sent);
             }
         } else {
-            // NO LONG CAPABILITY - FALLBACK TO STANDARD FORGE ENERGY (capped to Integer.MAX_VALUE)
-            var capability = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.below(), Direction.UP);
-            if (capability != null && capability.canReceive()) {
-                long energyToSendLong = Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, 
-                                                 this.energyStorageComponent.getLongEnergyStored());
-                int energyToSend = (int) Math.min(energyToSendLong, Integer.MAX_VALUE);
-                int sent = capability.receiveEnergy(energyToSend, false);
-                this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getLongEnergyStored() - sent);
+            // TRY FLUX NETWORKS LONG CAPABILITY (if Flux Networks is installed)
+            long energyToSend = Math.min(Config.RAY_RECEIVER_EXTRACT_POWER,
+                                         this.energyStorageComponent.getLongEnergyStored());
+            long fnResult = FluxNetworksIntegration.transferEnergy(level, pos.below(), Direction.UP, energyToSend);
+            if (fnResult >= 0) {
+                this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getLongEnergyStored() - fnResult);
+            } else {
+                // NO LONG CAPABILITY - FALLBACK TO STANDARD FORGE ENERGY (capped to Integer.MAX_VALUE)
+                var capability = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.below(), Direction.UP);
+                if (capability != null && capability.canReceive()) {
+                    long energyToSendLong = Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, 
+                                                     this.energyStorageComponent.getLongEnergyStored());
+                    int energyToSendInt = (int) Math.min(energyToSendLong, Integer.MAX_VALUE);
+                    int sent = capability.receiveEnergy(energyToSendInt, false);
+                    this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getLongEnergyStored() - sent);
+                }
             }
         }
 
