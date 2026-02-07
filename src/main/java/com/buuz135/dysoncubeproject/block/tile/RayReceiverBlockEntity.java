@@ -99,10 +99,11 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
                 this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getLongEnergyStored() - sent);
             }
         } else {
-            // TRY FLUX NETWORKS LONG CAPABILITY (if Flux Networks is installed)
+            // TRY FLUX NETWORKS' IFNEnergyStorage CAPABILITY (fluxnetworks:fn_energy)
+            // FN Plugs accept energy via receiveEnergyL; FN Points expose extractEnergyL
             long energyToSend = Math.min(Config.RAY_RECEIVER_EXTRACT_POWER,
                                          this.energyStorageComponent.getLongEnergyStored());
-            long fnResult = FluxNetworksIntegration.transferEnergy(level, pos.below(), Direction.UP, energyToSend);
+            long fnResult = FluxNetworksIntegration.sendEnergy(level, pos.below(), Direction.UP, energyToSend);
             if (fnResult >= 0) {
                 this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getLongEnergyStored() - fnResult);
             } else {
