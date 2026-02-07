@@ -161,9 +161,11 @@ public class LongEnergyStorageComponent<T extends IComponentHarness>
     @Nonnull
     public List<IFactory<? extends IContainerAddon>> getContainerAddons() {
         // For long values, we need to cap to int for container sync compatibility
+        // Note: The setter is intentionally a no-op to prevent client-side syncing from
+        // overwriting server-side energy values when energy exceeds Integer.MAX_VALUE
         return Lists.newArrayList(
             () -> new IntReferenceHolderAddon(new FunctionReferenceHolder(
-                (value) -> this.setEnergyStored(value), 
+                (value) -> {}, // No-op setter to prevent client overwrite
                 () -> (int) Math.min(this.getLongEnergyStored(), Integer.MAX_VALUE)
             ))
         );

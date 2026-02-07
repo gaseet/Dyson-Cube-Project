@@ -10,7 +10,7 @@ package com.buuz135.dysoncubeproject.integration;
  * 
  * To properly integrate with Flux Networks when it's installed:
  * 1. Add a soft dependency in your mod metadata
- * 2. Check if Flux Networks is loaded at runtime
+ * 2. Check if Flux Networks is loaded at runtime using ModList.get().isLoaded("fluxnetworks")
  * 3. Use reflection or a proper API dependency to access their capability
  */
 public class FluxNetworksIntegration {
@@ -19,15 +19,5 @@ public class FluxNetworksIntegration {
         // Utility class - no instantiation
     }
     
-    /**
-     * Placeholder for future Flux Networks integration.
-     * 
-     * The ILongEnergyStorage capability already provides compatibility
-     * with Flux Networks' long-based energy system.
-     */
-    public static boolean isFluxNetworksLoaded() {
-        // TODO: Implement proper mod loading check
-        // Example: return ModList.get().isLoaded("fluxnetworks");
-        return false;
-    }
+    // Future integration methods can be added here when needed
 }

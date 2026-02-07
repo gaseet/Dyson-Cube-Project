@@ -86,13 +86,16 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
         
         // TRY LONG CAPABILITY FIRST (DCP blocks, Flux Networks, etc.)
         var longCapability = level.getCapability(DCPCapabilities.LONG_ENERGY_STORAGE, pos.below(), Direction.UP);
-        if (longCapability != null && longCapability.canReceive()) {
-            long energyToSend = Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, 
-                                         this.energyStorageComponent.getLongEnergyStored());
-            long sent = longCapability.receiveLongEnergy(energyToSend, false);
-            this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getLongEnergyStored() - sent);
+        if (longCapability != null) {
+            // Long capability exists - use it even if it can't receive right now
+            if (longCapability.canReceive()) {
+                long energyToSend = Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, 
+                                             this.energyStorageComponent.getLongEnergyStored());
+                long sent = longCapability.receiveLongEnergy(energyToSend, false);
+                this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getLongEnergyStored() - sent);
+            }
         } else {
-            // FALLBACK TO STANDARD FORGE ENERGY (capped to Integer.MAX_VALUE)
+            // NO LONG CAPABILITY - FALLBACK TO STANDARD FORGE ENERGY (capped to Integer.MAX_VALUE)
             var capability = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.below(), Direction.UP);
             if (capability != null && capability.canReceive()) {
                 long energyToSendLong = Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, 
