@@ -1,9 +1,9 @@
 package com.buuz135.dysoncubeproject.api;
 
 import com.buuz135.dysoncubeproject.api.energy.ILongEnergyStorage;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.capabilities.CapabilityManager;
-import net.neoforged.neoforge.common.capabilities.CapabilityToken;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.capabilities.BlockCapability;
 
 /**
  * Custom capabilities for Dyson Cube Project.
@@ -18,8 +18,8 @@ public final class DCPCapabilities {
      * DCP will still handle standard Forge Energy implementations normally.
      * This is for advanced energy transfer between DCP blocks and compatible mods (e.g., Flux Networks).
      */
-    public static final Capability<ILongEnergyStorage> LONG_ENERGY_STORAGE = 
-        CapabilityManager.get(new CapabilityToken<>() {});
+    public static final BlockCapability<ILongEnergyStorage, Direction> LONG_ENERGY_STORAGE = 
+        BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath("dysoncubeproject", "long_energy_storage"), ILongEnergyStorage.class);
 
     private DCPCapabilities() {
     }
