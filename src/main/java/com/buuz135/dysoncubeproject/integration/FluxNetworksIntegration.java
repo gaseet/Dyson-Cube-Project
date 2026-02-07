@@ -78,7 +78,7 @@ public class FluxNetworksIntegration {
             available = true;
             LOGGER.info("Flux Networks integration initialized successfully - long energy transfers enabled");
         } catch (Exception e) {
-            LOGGER.warn("Failed to initialize Flux Networks integration, long transfers to FN blocks will be unavailable", e);
+            LOGGER.warn("Failed to initialize Flux Networks integration - FN API classes may have changed or mod version may be incompatible", e);
             available = false;
         }
     }

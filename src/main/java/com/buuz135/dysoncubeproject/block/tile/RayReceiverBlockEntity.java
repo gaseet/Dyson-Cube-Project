@@ -109,9 +109,7 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
                 // FN capability not found on target - fall back to standard Forge Energy
                 var capability = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.below(), Direction.UP);
                 if (capability != null && capability.canReceive()) {
-                    long energyToSendLong = Math.min(Config.RAY_RECEIVER_EXTRACT_POWER,
-                                                     this.energyStorageComponent.getLongEnergyStored());
-                    int energyToSendInt = (int) Math.min(energyToSendLong, Integer.MAX_VALUE);
+                    int energyToSendInt = (int) Math.min(energyToSend, Integer.MAX_VALUE);
                     int sentInt = capability.receiveEnergy(energyToSendInt, false);
                     this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getLongEnergyStored() - sentInt);
                 }
