@@ -34,7 +34,7 @@ public class RayReceiverFNEnergyStorage implements IFNEnergyStorage {
         DysonSphereStructure sphere = dysonData.getSpheres().get(sphereId);
         if (sphere == null) return 0;
 
-        long toExtract = Math.min(maxExtract, Config.RAY_RECEIVER_EXTRACT_POWER);
+        long toExtract = maxExtract;
         if (simulate) {
             return Math.min(toExtract, sphere.getStoredPower());
         }
