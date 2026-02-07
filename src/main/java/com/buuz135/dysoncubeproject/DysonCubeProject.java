@@ -5,6 +5,7 @@ import com.buuz135.dysoncubeproject.block.tile.RayReceiverBlockEntity;
 import com.buuz135.dysoncubeproject.api.DCPCapabilities;
 import com.buuz135.dysoncubeproject.client.ClientSetup;
 import com.buuz135.dysoncubeproject.datagen.*;
+import com.buuz135.dysoncubeproject.integration.FluxNetworksIntegration;
 import com.buuz135.dysoncubeproject.network.ClientSubscribeSphereMessage;
 import com.buuz135.dysoncubeproject.network.DysonSphereSyncMessage;
 import com.buuz135.dysoncubeproject.world.DysonSphereStructure;
@@ -101,6 +102,15 @@ public class DysonCubeProject extends ModuleController {
             event.registerBlock(DCPCapabilities.LONG_ENERGY_STORAGE, (level, blockPos, blockState, blockEntity, direction) -> {
                 if (level instanceof ServerLevel serverLevel && blockEntity instanceof RayReceiverBlockEntity rayReceiverBlockEntity && direction == Direction.DOWN) {
                     // This capability supports Long.MAX_VALUE energy transfers!
+                    return rayReceiverBlockEntity.getEnergyStorageComponent();
+                }
+                return null;
+            }, DCPContent.Blocks.RAY_RECEIVER_CONTROLLER.getBlock());
+
+            // FLUX NETWORKS INTEGRATION - expose DCP blocks via Flux Networks' IFNEnergyStorage capability
+            FluxNetworksIntegration.init();
+            FluxNetworksIntegration.registerBlockProvider(event, (level, blockPos, blockState, blockEntity, direction) -> {
+                if (level instanceof ServerLevel && blockEntity instanceof RayReceiverBlockEntity rayReceiverBlockEntity && direction == Direction.DOWN) {
                     return rayReceiverBlockEntity.getEnergyStorageComponent();
                 }
                 return null;
