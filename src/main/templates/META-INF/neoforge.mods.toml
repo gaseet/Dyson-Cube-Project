@@ -72,6 +72,15 @@ versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
+# Optional dependency on Flux Networks for long energy transfer support
+[[dependencies."${mod_id}"]]
+modId = "fluxnetworks"
+type = "optional"
+reason = "Enables long (>Integer.MAX_VALUE) energy transfers between DCP and Flux Networks blocks"
+versionRange = "[8,)"
+ordering = "AFTER"
+side = "BOTH"
+
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't
 # stop your mod loading on the server for example.
