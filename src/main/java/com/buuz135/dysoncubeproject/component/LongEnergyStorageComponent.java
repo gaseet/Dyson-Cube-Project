@@ -162,7 +162,10 @@ public class LongEnergyStorageComponent<T extends IComponentHarness>
     public List<IFactory<? extends IContainerAddon>> getContainerAddons() {
         // For long values, we need to cap to int for container sync compatibility
         // Note: The setter is intentionally a no-op to prevent client-side syncing from
-        // overwriting server-side energy values when energy exceeds Integer.MAX_VALUE
+        // overwriting server-side energy values when energy exceeds Integer.MAX_VALUE.
+        // This means the container sync is READ-ONLY. The client will display capped values
+        // when energy exceeds Integer.MAX_VALUE, but this is acceptable as the true value
+        // is maintained on the server and in NBT.
         return Lists.newArrayList(
             () -> new IntReferenceHolderAddon(new FunctionReferenceHolder(
                 (value) -> {}, // No-op setter to prevent client overwrite

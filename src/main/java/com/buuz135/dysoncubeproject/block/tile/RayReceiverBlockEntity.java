@@ -58,6 +58,9 @@ import java.util.List;
 public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> implements IScreenAddonProvider, ITickableBlockEntity<RayReceiverBlockEntity>, MenuProvider, IButtonHandler, IContainerAddonProvider, IHasAssetProvider, IComponentHarness {
 
 
+    private static final int ENERGY_BAR_X_POS = 19;
+    private static final int ENERGY_BAR_Y_POS = 22;
+
     @Save
     private String dysonSphereId;
     @Save
@@ -68,7 +71,7 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
     public RayReceiverBlockEntity(BasicTileBlock<RayReceiverBlockEntity> base, BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
         super(base, blockEntityType, pos, state);
         this.dysonSphereId = "";
-        this.energyStorageComponent = new LongEnergyStorageComponent<>(Config.RAY_RECEIVER_POWER_BUFFER, 0, Long.MAX_VALUE, 19, 22);
+        this.energyStorageComponent = new LongEnergyStorageComponent<>(Config.RAY_RECEIVER_POWER_BUFFER, 0, Long.MAX_VALUE, ENERGY_BAR_X_POS, ENERGY_BAR_Y_POS);
         this.energyStorageComponent.setComponentHarness(this);
         this.currentPitch = 270;
     }
@@ -87,7 +90,7 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
         // TRY LONG CAPABILITY FIRST (DCP blocks, Flux Networks, etc.)
         var longCapability = level.getCapability(DCPCapabilities.LONG_ENERGY_STORAGE, pos.below(), Direction.UP);
         if (longCapability != null) {
-            // Long capability exists - use it even if it can't receive right now
+            // Long capability exists - try to transfer energy
             if (longCapability.canReceive()) {
                 long energyToSend = Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, 
                                              this.energyStorageComponent.getLongEnergyStored());
