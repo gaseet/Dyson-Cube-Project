@@ -203,16 +203,10 @@ public class FluxNetworksIntegration {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             return switch (method.getName()) {
-                // Long-based IFNEnergyStorage methods
                 case "receiveEnergyL" -> storage.receiveLongEnergy((long) args[0], (boolean) args[1]);
                 case "extractEnergyL" -> storage.extractLongEnergy((long) args[0], (boolean) args[1]);
                 case "getEnergyStoredL" -> storage.getLongEnergyStored();
                 case "getMaxEnergyStoredL" -> storage.getMaxLongEnergyStored();
-                // Int-based IEnergyStorage methods (IFNEnergyStorage extends IEnergyStorage)
-                case "receiveEnergy" -> (int) Math.min(storage.receiveLongEnergy((int) args[0], (boolean) args[1]), Integer.MAX_VALUE);
-                case "extractEnergy" -> (int) Math.min(storage.extractLongEnergy((int) args[0], (boolean) args[1]), Integer.MAX_VALUE);
-                case "getEnergyStored" -> (int) Math.min(storage.getLongEnergyStored(), Integer.MAX_VALUE);
-                case "getMaxEnergyStored" -> (int) Math.min(storage.getMaxLongEnergyStored(), Integer.MAX_VALUE);
                 case "canExtract" -> storage.canExtract();
                 case "canReceive" -> storage.canReceive();
                 case "toString" -> "FNEnergyStorageProxy[" + storage + "]";
