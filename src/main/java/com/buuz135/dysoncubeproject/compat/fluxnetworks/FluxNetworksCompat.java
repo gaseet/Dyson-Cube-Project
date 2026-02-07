@@ -10,6 +10,7 @@ import sonar.fluxnetworks.api.FluxCapabilities;
 public class FluxNetworksCompat {
 
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        // Register on DOWN face only, consistent with the standard FE capability registration for this block
         event.registerBlock(FluxCapabilities.BLOCK, (level, blockPos, blockState, blockEntity, direction) -> {
             if (level instanceof ServerLevel && blockEntity instanceof RayReceiverBlockEntity rayReceiverBlockEntity && direction == Direction.DOWN) {
                 return new RayReceiverFNEnergyStorage(rayReceiverBlockEntity);
