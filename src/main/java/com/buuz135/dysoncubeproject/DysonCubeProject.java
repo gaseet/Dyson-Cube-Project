@@ -27,6 +27,7 @@ import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -92,6 +93,9 @@ public class DysonCubeProject extends ModuleController {
                 }
                 return null;
             }, DCPContent.Blocks.RAY_RECEIVER_CONTROLLER.getBlock());
+            if (ModList.get().isLoaded("fluxnetworks")) {
+                com.buuz135.dysoncubeproject.compat.fluxnetworks.FluxNetworksCompat.registerCapabilities(event);
+            }
         }).subscribe();
         EventManager.forge(RegisterCommandsEvent.class).process(event -> {
             var dispatcher = event.getDispatcher();
