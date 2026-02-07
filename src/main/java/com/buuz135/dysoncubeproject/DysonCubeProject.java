@@ -2,6 +2,7 @@ package com.buuz135.dysoncubeproject;
 
 import com.buuz135.dysoncubeproject.block.tile.EMRailEjectorBlockEntity;
 import com.buuz135.dysoncubeproject.block.tile.RayReceiverBlockEntity;
+import com.buuz135.dysoncubeproject.api.DCPCapabilities;
 import com.buuz135.dysoncubeproject.client.ClientSetup;
 import com.buuz135.dysoncubeproject.datagen.*;
 import com.buuz135.dysoncubeproject.network.ClientSubscribeSphereMessage;
@@ -88,6 +89,17 @@ public class DysonCubeProject extends ModuleController {
             }, DCPContent.Blocks.MULTIBLOCK_STRUCTURE.getBlock());
             event.registerBlock(Capabilities.EnergyStorage.BLOCK, (level, blockPos, blockState, blockEntity, direction) -> {
                 if (level instanceof ServerLevel serverLevel && blockEntity instanceof RayReceiverBlockEntity rayReceiverBlockEntity && direction == Direction.DOWN) {
+                    // Note: IEnergyStorage interface uses int, but our component stores long values
+                    // Values are automatically capped when accessed through this interface
+                    return rayReceiverBlockEntity.getEnergyStorageComponent();
+                }
+                return null;
+            }, DCPContent.Blocks.RAY_RECEIVER_CONTROLLER.getBlock());
+            
+            // LONG ENERGY STORAGE (long-based, for DCP and compatible mods like Flux Networks)
+            event.registerBlock(DCPCapabilities.LONG_ENERGY_STORAGE, (level, blockPos, blockState, blockEntity, direction) -> {
+                if (level instanceof ServerLevel serverLevel && blockEntity instanceof RayReceiverBlockEntity rayReceiverBlockEntity && direction == Direction.DOWN) {
+                    // This capability supports Long.MAX_VALUE energy transfers!
                     return rayReceiverBlockEntity.getEnergyStorageComponent();
                 }
                 return null;
