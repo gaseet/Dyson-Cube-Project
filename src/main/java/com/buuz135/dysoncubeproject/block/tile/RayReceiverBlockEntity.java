@@ -88,7 +88,9 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
             this.storedEnergy -= received;
             capability.receiveEnergy(received, false);
         }
-        this.energyStorageComponent.setEnergyStored((int) Math.min(this.storedEnergy, Integer.MAX_VALUE));
+        long buf = Config.RAY_RECEIVER_POWER_BUFFER;
+        long componentMax = Math.min(buf, (long) Integer.MAX_VALUE);
+        this.energyStorageComponent.setEnergyStored(buf > 0 ? (int) (componentMax * ((double) this.storedEnergy / buf)) : 0);
 
         float targetPitch = level.getTimeOfDay(1f) * 360f;
 
