@@ -46,6 +46,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import org.jetbrains.annotations.NotNull;
 
@@ -56,6 +57,7 @@ import java.util.List;
 
 public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> implements IScreenAddonProvider, ITickableBlockEntity<RayReceiverBlockEntity>, MenuProvider, IButtonHandler, IContainerAddonProvider, IHasAssetProvider, IComponentHarness {
 
+    private static final boolean FLUX_NETWORKS_LOADED = ModList.get().isLoaded("fluxnetworks");
 
     @Save
     private String dysonSphereId;
@@ -81,12 +83,23 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
             var extracted = dyson.getSpheres().computeIfAbsent(this.dysonSphereId, s -> new DysonSphereStructure()).extractPower(extractingAmount);
             this.storedEnergy += extracted;
         }
-        var capability = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.below(), Direction.UP);
-        if (capability != null && capability.canReceive()) {
-            var toSend = (int) Math.min(Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, Integer.MAX_VALUE), this.storedEnergy);
-            var received = capability.receiveEnergy(toSend, true);
-            this.storedEnergy -= received;
-            capability.receiveEnergy(received, false);
+        boolean energyPushed = false;
+        if (FLUX_NETWORKS_LOADED) {
+            long toSend = Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, this.storedEnergy);
+            long transferred = com.buuz135.dysoncubeproject.compat.fluxnetworks.FluxNetworksCompat.pushEnergy(level, pos.below(), Direction.UP, toSend);
+            if (transferred >= 0) {
+                this.storedEnergy -= transferred;
+                energyPushed = true;
+            }
+        }
+        if (!energyPushed) {
+            var capability = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.below(), Direction.UP);
+            if (capability != null && capability.canReceive()) {
+                var toSend = (int) Math.min(Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, Integer.MAX_VALUE), this.storedEnergy);
+                var received = capability.receiveEnergy(toSend, true);
+                this.storedEnergy -= received;
+                capability.receiveEnergy(received, false);
+            }
         }
         long buf = Config.RAY_RECEIVER_POWER_BUFFER;
         long componentMax = Math.min(buf, (long) Integer.MAX_VALUE);
