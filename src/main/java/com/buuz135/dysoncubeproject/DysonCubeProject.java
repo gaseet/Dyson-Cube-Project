@@ -89,7 +89,7 @@ public class DysonCubeProject extends ModuleController {
             }, DCPContent.Blocks.MULTIBLOCK_STRUCTURE.getBlock());
             event.registerBlock(Capabilities.EnergyStorage.BLOCK, (level, blockPos, blockState, blockEntity, direction) -> {
                 if (level instanceof ServerLevel serverLevel && blockEntity instanceof RayReceiverBlockEntity rayReceiverBlockEntity && direction == Direction.DOWN) {
-                    return rayReceiverBlockEntity.getEnergyStorageComponent();
+                    return new com.buuz135.dysoncubeproject.block.tile.RayReceiverEnergyStorage(rayReceiverBlockEntity);
                 }
                 return null;
             }, DCPContent.Blocks.RAY_RECEIVER_CONTROLLER.getBlock());

@@ -59,15 +59,17 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
 
     @Save
     private String dysonSphereId;
-    @Save
     private EnergyStorageComponent<RayReceiverBlockEntity> energyStorageComponent;
+    @Save
+    private long storedEnergy;
     @Save
     private float currentPitch;
 
     public RayReceiverBlockEntity(BasicTileBlock<RayReceiverBlockEntity> base, BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
         super(base, blockEntityType, pos, state);
         this.dysonSphereId = "";
-        this.energyStorageComponent = new EnergyStorageComponent<>(Config.RAY_RECEIVER_POWER_BUFFER, 0, Integer.MAX_VALUE, 19, 22);
+        this.storedEnergy = 0;
+        this.energyStorageComponent = new EnergyStorageComponent<>((int) Math.min(Config.RAY_RECEIVER_POWER_BUFFER, Integer.MAX_VALUE), 0, Integer.MAX_VALUE, 19, 22);
         this.currentPitch = 270;
     }
 
@@ -75,16 +77,18 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
     public void serverTick(Level level, BlockPos pos, BlockState state, RayReceiverBlockEntity blockEntity) {
         if (level.isDay() && !level.isRaining() && level.canSeeSky(pos.above())) {
             var dyson = DysonSphereProgressSavedData.get(level);
-            var extractingAmount = Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, this.energyStorageComponent.getMaxEnergyStored() - this.energyStorageComponent.getEnergyStored());
+            var extractingAmount = Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, Config.RAY_RECEIVER_POWER_BUFFER - this.storedEnergy);
             var extracted = dyson.getSpheres().computeIfAbsent(this.dysonSphereId, s -> new DysonSphereStructure()).extractPower(extractingAmount);
-            this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getEnergyStored() + (int) Math.min(extracted, Integer.MAX_VALUE));
+            this.storedEnergy += extracted;
         }
         var capability = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.below(), Direction.UP);
         if (capability != null && capability.canReceive()) {
-            var received = capability.receiveEnergy(Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, this.energyStorageComponent.getEnergyStored()), true);
-            this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getEnergyStored() - received);
+            var toSend = (int) Math.min(Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, Integer.MAX_VALUE), this.storedEnergy);
+            var received = capability.receiveEnergy(toSend, true);
+            this.storedEnergy -= received;
             capability.receiveEnergy(received, false);
         }
+        this.energyStorageComponent.setEnergyStored((int) Math.min(this.storedEnergy, Integer.MAX_VALUE));
 
         float targetPitch = level.getTimeOfDay(1f) * 360f;
 
@@ -189,6 +193,15 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
 
     public EnergyStorageComponent<RayReceiverBlockEntity> getEnergyStorageComponent() {
         return energyStorageComponent;
+    }
+
+    public long getStoredEnergy() {
+        return storedEnergy;
+    }
+
+    public void setStoredEnergy(long energy) {
+        this.storedEnergy = Math.max(0, Math.min(energy, Config.RAY_RECEIVER_POWER_BUFFER));
+        this.markForUpdate();
     }
 
     public float getCurrentPitch() {
