@@ -67,7 +67,7 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
     public RayReceiverBlockEntity(BasicTileBlock<RayReceiverBlockEntity> base, BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
         super(base, blockEntityType, pos, state);
         this.dysonSphereId = "";
-        this.energyStorageComponent = new EnergyStorageComponent<>(Config.RAY_RECEIVER_POWER_BUFFER, 0, Integer.MAX_VALUE, 19, 22);
+        this.energyStorageComponent = new EnergyStorageComponent<>((int) Math.min(Config.RAY_RECEIVER_POWER_BUFFER, Integer.MAX_VALUE), 0, Integer.MAX_VALUE, 19, 22);
         this.currentPitch = 270;
     }
 
@@ -81,7 +81,7 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
         }
         var capability = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.below(), Direction.UP);
         if (capability != null && capability.canReceive()) {
-            var received = capability.receiveEnergy(Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, this.energyStorageComponent.getEnergyStored()), true);
+            var received = capability.receiveEnergy((int) Math.min(Math.min(Config.RAY_RECEIVER_EXTRACT_POWER, Integer.MAX_VALUE), this.energyStorageComponent.getEnergyStored()), true);
             this.energyStorageComponent.setEnergyStored(this.energyStorageComponent.getEnergyStored() - received);
             capability.receiveEnergy(received, false);
         }
