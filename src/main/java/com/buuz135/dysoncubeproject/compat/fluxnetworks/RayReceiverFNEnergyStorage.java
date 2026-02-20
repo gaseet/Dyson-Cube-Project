@@ -44,28 +44,28 @@ public class RayReceiverFNEnergyStorage implements IFNEnergyStorage {
     @Override
     public long getEnergyStoredL() {
         Level level = blockEntity.getLevel();
-        if (level == null || level.isClientSide()) return blockEntity.getEnergyStorageComponent().getEnergyStored();
+        if (level == null || level.isClientSide()) return blockEntity.getStoredEnergy();
         String sphereId = blockEntity.getDysonSphereId();
-        if (sphereId == null || sphereId.isEmpty()) return blockEntity.getEnergyStorageComponent().getEnergyStored();
+        if (sphereId == null || sphereId.isEmpty()) return blockEntity.getStoredEnergy();
 
         var dysonData = DysonSphereProgressSavedData.get(level);
         DysonSphereStructure sphere = dysonData.getSpheres().get(sphereId);
-        if (sphere == null) return blockEntity.getEnergyStorageComponent().getEnergyStored();
+        if (sphere == null) return blockEntity.getStoredEnergy();
         return sphere.getStoredPower();
     }
 
     @Override
     public long getMaxEnergyStoredL() {
         Level level = blockEntity.getLevel();
-        if (level == null || level.isClientSide()) return blockEntity.getEnergyStorageComponent().getMaxEnergyStored();
+        if (level == null || level.isClientSide()) return Config.RAY_RECEIVER_POWER_BUFFER;
         String sphereId = blockEntity.getDysonSphereId();
-        if (sphereId == null || sphereId.isEmpty()) return blockEntity.getEnergyStorageComponent().getMaxEnergyStored();
+        if (sphereId == null || sphereId.isEmpty()) return Config.RAY_RECEIVER_POWER_BUFFER;
 
         var dysonData = DysonSphereProgressSavedData.get(level);
         DysonSphereStructure sphere = dysonData.getSpheres().get(sphereId);
-        if (sphere == null) return blockEntity.getEnergyStorageComponent().getMaxEnergyStored();
+        if (sphere == null) return Config.RAY_RECEIVER_POWER_BUFFER;
         long maxPower = (long) sphere.getSolarPanels() * Config.POWER_PER_SAIL;
-        return Math.max(maxPower, blockEntity.getEnergyStorageComponent().getMaxEnergyStored());
+        return Math.max(maxPower, Config.RAY_RECEIVER_POWER_BUFFER);
     }
 
     @Override
