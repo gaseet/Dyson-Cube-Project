@@ -25,7 +25,11 @@ public class ClientSubscribeSphereMessage extends Message {
                 var level = sp.level();
                 var data = DysonSphereProgressSavedData.get(level);
                 if (data != null && sphereId != null) {
-                    data.getSubscribedPlayers().put(sp.getStringUUID(), sphereId);
+                    if (sphereId.equals("-")) {
+                        data.getSubscribedPlayers().remove(sp.getStringUUID());
+                    } else {
+                        data.getSubscribedPlayers().put(sp.getStringUUID(), sphereId);
+                    }
                     data.setDirty();
                 }
             }

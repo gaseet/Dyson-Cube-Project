@@ -4,6 +4,7 @@ import com.buuz135.dysoncubeproject.Config;
 import com.buuz135.dysoncubeproject.DCPContent;
 import com.buuz135.dysoncubeproject.client.gui.DysonProgressGuiAddon;
 import com.buuz135.dysoncubeproject.client.gui.SubscribeDysonGuiAddon;
+import com.buuz135.dysoncubeproject.client.gui.UnsubscribeDysonGuiAddon;
 import com.buuz135.dysoncubeproject.world.DysonSphereStructure;
 import com.buuz135.dysoncubeproject.world.DysonSphereProgressSavedData;
 import com.hrznstudio.titanium.annotation.Save;
@@ -149,6 +150,7 @@ public class RayReceiverBlockEntity extends BasicTile<RayReceiverBlockEntity> im
         list.addAll(this.energyStorageComponent.getScreenAddons());
         list.add(() -> new DysonProgressGuiAddon(this.dysonSphereId, 56, 24));
         list.add(() -> new SubscribeDysonGuiAddon(this.dysonSphereId, 9, 24 + 60));
+        list.add(() -> new UnsubscribeDysonGuiAddon(9 + 18, 24 + 60));
         return list;
     }
 

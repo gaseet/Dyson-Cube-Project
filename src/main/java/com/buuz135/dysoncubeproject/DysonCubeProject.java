@@ -15,11 +15,13 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.logging.LogUtils;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.*;
@@ -63,6 +65,9 @@ public class DysonCubeProject extends ModuleController {
                     for (ServerPlayer player : serverLevel.getServer().getPlayerList().getPlayers()) {
                         NETWORK.sendTo(packet, player);
                     }
+                }
+                if (post.getLevel().getGameTime() % 200 == 0) {
+                    publishAdvancements(serverLevel, data);
                 }
                 data.getSpheres().values().forEach(DysonSphereStructure::generatePower);
                 data.setDirty();
@@ -195,6 +200,39 @@ public class DysonCubeProject extends ModuleController {
         DCPContent.Sounds.init();
     }
 
+    public static void publishAdvancements(ServerLevel server, DysonSphereProgressSavedData data) {
+        for (String player : data.getSubscribedPlayers().keySet()) {
+            ServerPlayer serverPlayer = null;
+            for (ServerPlayer player1 : server.getServer().getPlayerList().getPlayers()) {
+                if (player1.getGameProfile().getId().toString().equals(player)) {
+                    serverPlayer = player1;
+                    break;
+                }
+            }
+            if (serverPlayer == null) continue;
+            var sphereName = data.getSubscribedFor(player);
+            if (sphereName == null) continue;
+            if (!data.getSpheres().containsKey(sphereName)) continue;
+            var sphere = data.getSpheres().get(sphereName);
+            if (sphere == null) continue;
+            var progress = sphere.getProgress() * 100;
+            var amounts = new int[]{5, 15, 25, 50, 75, 100};
+            for (int amount : amounts) {
+                if (progress >= amount) {
+                    var advancement = server.getServer().getAdvancements().get(ResourceLocation.fromNamespaceAndPath(MODID, "main/em_railejector_controller/" + amount));
+                    if (advancement != null) {
+                        var progressData = serverPlayer.getAdvancements().getOrStartProgress(advancement);
+                        if (!progressData.isDone()) {
+                            for (String criterion : progressData.getRemainingCriteria()) {
+                                serverPlayer.getAdvancements().award(advancement, criterion);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public void addDataProvider(GatherDataEvent event) {
         super.addDataProvider(event);
@@ -204,5 +242,6 @@ public class DysonCubeProject extends ModuleController {
         event.addProvider(new DCPLootTableDataProvider(event.getGenerator(), () -> List.of(DCPContent.Blocks.EM_RAILEJECTOR_CONTROLLER.getBlock(),
                 DCPContent.Blocks.RAY_RECEIVER_CONTROLLER.getBlock()), event.getLookupProvider()));
         event.addProvider(new DCPBlockTagsProvider(event.getGenerator().getPackOutput(), event.getLookupProvider(), MODID, event.getExistingFileHelper()));
+        event.addProvider(new DCPAdvancementProvider(event.getGenerator().getPackOutput(), event.getLookupProvider(), event.getExistingFileHelper()));
     }
 }

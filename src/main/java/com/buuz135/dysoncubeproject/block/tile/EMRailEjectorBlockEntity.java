@@ -5,6 +5,7 @@ import com.buuz135.dysoncubeproject.DCPAttachments;
 import com.buuz135.dysoncubeproject.DCPContent;
 import com.buuz135.dysoncubeproject.client.gui.DysonProgressGuiAddon;
 import com.buuz135.dysoncubeproject.client.gui.SubscribeDysonGuiAddon;
+import com.buuz135.dysoncubeproject.client.gui.UnsubscribeDysonGuiAddon;
 import com.buuz135.dysoncubeproject.world.DysonSphereStructure;
 import com.buuz135.dysoncubeproject.world.DysonSphereProgressSavedData;
 import com.hrznstudio.titanium.annotation.Save;
@@ -115,7 +116,7 @@ public class EMRailEjectorBlockEntity extends BasicTile<EMRailEjectorBlockEntity
         if (dyson.getProgress() >= 1) return false;
         var solarPanels = this.input.getStackInSlot(0).getOrDefault(DCPAttachments.SOLAR_SAIL, 0);
         var beams = this.input.getStackInSlot(0).getOrDefault(DCPAttachments.BEAM, 0);
-        if (solarPanels > 0 && (dyson.getSolarPanels() + solarPanels) >= dyson.getMaxSolarPanels()) return false;
+        if (solarPanels > 0 && (dyson.getSolarPanels() + solarPanels) > dyson.getMaxSolarPanels()) return false;
         if (beams > 0 && dyson.getBeams() >= dyson.getMaxBeams()) return false;
         if (this.rampupAmount > 1 && this.getPower().getEnergyStored() < (Math.pow(this.rampupAmount, 2) * Config.RAIL_EJECTOR_CONSUME)) {
             this.rampupAmount = 1;
@@ -253,6 +254,7 @@ public class EMRailEjectorBlockEntity extends BasicTile<EMRailEjectorBlockEntity
         list.addAll(this.input.getScreenAddons());
         list.add(() -> new DysonProgressGuiAddon(this.dysonSphereId, 62, 24));
         list.add(() -> new SubscribeDysonGuiAddon(this.dysonSphereId, 9, 24 + 60));
+        list.add(() -> new UnsubscribeDysonGuiAddon(9 + 18, 24 + 60));
         list.addAll(this.power.getScreenAddons());
         list.addAll(this.progressBarComponent.getScreenAddons());
 

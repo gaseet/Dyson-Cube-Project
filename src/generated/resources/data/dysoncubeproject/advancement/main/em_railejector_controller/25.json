@@ -1,0 +1,26 @@
+{
+  "parent": "dysoncubeproject:main/em_railejector_controller/15",
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.dysoncubeproject.em_railejector_controller/sphere_percentage_25.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "dysoncubeproject:solar_sail"
+    },
+    "title": {
+      "translate": "advancement.dysoncubeproject.em_railejector_controller/sphere_percentage_25.title"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
